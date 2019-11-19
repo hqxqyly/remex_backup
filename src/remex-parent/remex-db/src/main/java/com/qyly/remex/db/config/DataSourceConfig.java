@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.qyly.remex.db.properties.DataSourceProperties;
-import com.smart.remex.exception.RemexException;
+import com.qyly.remex.exception.RemexException;
 
 /**
  * DataSource config

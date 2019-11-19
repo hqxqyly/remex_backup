@@ -12,11 +12,11 @@
   
   <dependencies>
   	<dependency>
-		<groupId>com.smart.remex</groupId>
+		<groupId>com.qyly.remex</groupId>
 		<artifactId>remex-core</artifactId>
 	</dependency>
 	<dependency>
-		<groupId>com.smart.remex</groupId>
+		<groupId>com.qyly.remex</groupId>
 		<artifactId>remex-mybatis</artifactId>
 	</dependency>
   		

@@ -1,7 +1,7 @@
 package com.qyly.remex.mybatis.plus.properties;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
-import com.smart.remex.mybatis.properties.MybatisProperties;
+import com.qyly.remex.mybatis.properties.MybatisProperties;
 
 /**
  * Mybatis plus properties

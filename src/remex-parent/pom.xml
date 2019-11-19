@@ -21,17 +21,19 @@
     <module>remex-swagger</module>
     <module>remex-mybatis</module>
     <module>remex-mybatis-plus</module>
+    <module>remex-ftp</module>
+    <module>remex-http</module>
   </modules>
 
   <dependencyManagement>
   	<dependencies>  
   		<dependency>
-  			<groupId>com.smart.remex</groupId>
+  			<groupId>com.qyly.remex</groupId>
   			<artifactId>remex-core</artifactId>
   			<version>${project.version}</version>
   		</dependency>
   		<dependency>
-  			<groupId>com.smart.remex</groupId>
+  			<groupId>com.qyly.remex</groupId>
   			<artifactId>remex-mybatis</artifactId>
   			<version>${project.version}</version>
   		</dependency>
@@ -105,6 +107,16 @@
 		    <groupId>com.baomidou</groupId>
 		    <artifactId>mybatis-plus</artifactId>
 		    <version>3.2.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>commons-net</groupId>
+		    <artifactId>commons-net</artifactId>
+		    <version>3.6</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient</artifactId>
+		    <version>4.5.9</version>
 		</dependency>
 	</dependencies>
   </dependencyManagement>

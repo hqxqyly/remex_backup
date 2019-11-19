@@ -12,7 +12,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.qyly.remex.mybatis.plus.properties.MybatisPlusProperties;
-import com.smart.remex.utils.StringUtils;
+import com.qyly.remex.utils.StringUtils;
 
 /**
  * Mybatis plus config

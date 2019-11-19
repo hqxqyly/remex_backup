@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import com.qyly.remex.mybatis.properties.MybatisProperties;
-import com.smart.remex.utils.StringUtils;
+import com.qyly.remex.utils.StringUtils;
 
 /**
  * Mybatis config

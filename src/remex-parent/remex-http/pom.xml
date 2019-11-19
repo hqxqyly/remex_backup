@@ -8,17 +8,17 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   
-  <artifactId>remex-db</artifactId>
+  <artifactId>remex-http</artifactId>
   
   <dependencies>
   	<dependency>
 		<groupId>com.qyly.remex</groupId>
 		<artifactId>remex-core</artifactId>
 	</dependency>
-  		
-  	<dependency>
-	    <groupId>com.alibaba</groupId>
-	    <artifactId>druid</artifactId>
+	
+	<dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpclient</artifactId>
 	</dependency>
   </dependencies>
 </project>
