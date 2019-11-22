@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   
-  <artifactId>remex-shiro</artifactId>
+  <artifactId>remex-security</artifactId>
   
   <dependencies>
   	<dependency>
@@ -20,9 +20,9 @@
 		<artifactId>remex-web</artifactId>
 	</dependency>
 	
-	<dependency>
-		<groupId>org.apache.shiro</groupId>
-		<artifactId>shiro-spring</artifactId>
+  	<dependency>
+	    <groupId>org.springframework.boot</groupId>
+	    <artifactId>spring-boot-starter-security</artifactId>
 	</dependency>
   </dependencies>
 </project>

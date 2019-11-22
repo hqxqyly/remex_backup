@@ -8,7 +8,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 
-import com.qyly.remex.shiro.component.access.BaseShiroRealm;
+import com.qyly.remex.shiro.component.modules.BaseShiroRealm;
 
 /**
  * shiro配置项

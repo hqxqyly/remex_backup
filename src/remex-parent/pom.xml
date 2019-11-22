@@ -29,6 +29,8 @@
     <module>remex-redis</module>
     <module>remex-shiro</module>
     <module>remex-shiro-redis</module>
+    <module>remex-security</module>
+    <module>remex-web</module>
   </modules>
 
   <dependencyManagement>
@@ -53,6 +55,11 @@
 			<artifactId>remex-shiro</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+  			<groupId>com.qyly.remex</groupId>
+  			<artifactId>remex-web</artifactId>
+  			<version>${project.version}</version>
+  		</dependency>
   		
   		<dependency>
 		    <groupId>commons-collections</groupId>
@@ -178,6 +185,11 @@
 			<groupId>org.crazycake</groupId>
 			<artifactId>shiro-redis</artifactId>
 			<version>3.2.3</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-security</artifactId>
+		    <version>${bootVersion}</version>
 		</dependency>
 	</dependencies>
   </dependencyManagement>

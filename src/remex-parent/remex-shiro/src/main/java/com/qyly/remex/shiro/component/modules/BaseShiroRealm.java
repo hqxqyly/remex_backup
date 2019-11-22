@@ -1,4 +1,4 @@
-package com.qyly.remex.shiro.component.access;
+package com.qyly.remex.shiro.component.modules;
 
 import java.util.List;
 

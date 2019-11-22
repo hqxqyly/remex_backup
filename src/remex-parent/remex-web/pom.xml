@@ -8,21 +8,17 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   
-  <artifactId>remex-shiro</artifactId>
+  <artifactId>remex-web</artifactId>
   
   <dependencies>
   	<dependency>
 		<groupId>com.qyly.remex</groupId>
 		<artifactId>remex-core</artifactId>
 	</dependency>
-	<dependency>
-		<groupId>com.qyly.remex</groupId>
-		<artifactId>remex-web</artifactId>
-	</dependency>
 	
-	<dependency>
-		<groupId>org.apache.shiro</groupId>
-		<artifactId>shiro-spring</artifactId>
+  	<dependency>
+	    <groupId>org.springframework.boot</groupId>
+	    <artifactId>spring-boot-starter-web</artifactId>
 	</dependency>
   </dependencies>
 </project>
