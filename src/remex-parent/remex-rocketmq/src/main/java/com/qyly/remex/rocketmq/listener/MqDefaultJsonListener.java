@@ -3,7 +3,7 @@ package com.qyly.remex.rocketmq.listener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.qyly.remex.utils.ObjectUtils;
+import com.qyly.remex.utils.Assist;
 
 /**
  * mq消费者监听器默认基础类，json格式，会进行相关的异常处理及日志打印
@@ -24,7 +24,7 @@ public abstract class MqDefaultJsonListener<T> extends MqJsonListener<T> {
 	protected boolean handleMessage(String message, String msgId) {
 		String listenerName = getClass().getName();
 		
-		if (ObjectUtils.isBlank(message)) {
+		if (Assist.isBlank(message)) {
 			logger.error("mq handle message, message cannot be blank [listenerName : {}]", listenerName);
 			return false;
 		}

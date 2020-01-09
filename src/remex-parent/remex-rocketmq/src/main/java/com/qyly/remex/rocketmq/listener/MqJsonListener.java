@@ -4,7 +4,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import com.alibaba.fastjson.JSONObject;
-import com.qyly.remex.utils.StringUtils;
 
 /**
  * mq消费者监听器基础类，json格式
@@ -40,11 +39,7 @@ public abstract class MqJsonListener<T> extends MqBaseListener {
      */
 	@Override
 	protected boolean handleMessage(String message, String msgId) {
-		T obj = null;
-		if (StringUtils.isNotBlank(message)) {
-			obj = JSONObject.parseObject(message, msgClass);
-		}
-		
+		T obj = JSONObject.parseObject(message, msgClass);
 		return handle(obj, msgId);
 	}
 }

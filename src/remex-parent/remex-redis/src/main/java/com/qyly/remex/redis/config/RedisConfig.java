@@ -9,9 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.qyly.remex.redis.properties.RedisProperties;
-import com.qyly.remex.utils.Assert;
-import com.qyly.remex.utils.ObjectUtils;
-import com.qyly.remex.utils.StringUtils;
+import com.qyly.remex.utils.Assist;
 
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -43,7 +41,7 @@ public class RedisConfig {
 	@Bean
 	@ConditionalOnMissingBean
 	public JedisConnectionFactory createJedisConnectionFactory(RedisProperties properties) {
-		Assert.isTrue(ObjectUtils.isNotEmpty(properties.getHostName()), "redis hostName cannot be null");
+		Assist.notEmpty(properties.getHostName(), "redis hostName cannot be null");
 		
 		String[] addressArr = properties.getHostName();
 		JedisConnectionFactory bean = null;
@@ -51,10 +49,10 @@ public class RedisConfig {
 		if (addressArr.length > 1) {
 			//集群配置
 			RedisClusterConfiguration clusterConfig = new RedisClusterConfiguration();
-			for (String address : addressArr) {
+			Assist.forEach(addressArr, address -> {
 				String[] hostNameArr = address.split(":");
 				clusterConfig.clusterNode(hostNameArr[0], Integer.valueOf(hostNameArr[1]));
-			}
+			});
 			clusterConfig.setMaxRedirects(properties.getMaxRedirects());
 			
 			//连接池配置
@@ -70,9 +68,7 @@ public class RedisConfig {
 			
 			bean.setHostName(hostNameArr[0]);
 			bean.setPort(Integer.valueOf(hostNameArr[1]));
-			if (StringUtils.isNotBlank(properties.getPassword())) {
-				bean.setPassword(properties.getPassword());
-			}
+			Assist.ifNotBlank(properties.getPassword(), bean::setPassword);
 			bean.setTimeout(properties.getTimeout());
 		}
 		

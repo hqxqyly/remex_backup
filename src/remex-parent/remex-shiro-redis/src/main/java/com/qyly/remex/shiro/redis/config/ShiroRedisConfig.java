@@ -19,6 +19,7 @@ import com.qyly.remex.redis.properties.RedisProperties;
 import com.qyly.remex.shiro.config.ShiroConfig;
 import com.qyly.remex.shiro.properties.ShiroProperties;
 import com.qyly.remex.utils.Assert;
+import com.qyly.remex.utils.Assist;
 import com.qyly.remex.utils.ObjectUtils;
 import com.qyly.remex.utils.StringUtils;
 
@@ -93,10 +94,8 @@ public class ShiroRedisConfig extends ShiroConfig {
 		bean.setRedisManager(redisManager);
 		
 		//缓存数据所用的表名
-		if (StringUtils.isNotBlank(shiroProperties.getCacheSessionTableName())) {
-			bean.setKeyPrefix(shiroProperties.getCacheSessionTableName());
-		}
-
+		Assist.ifNotBlank(shiroProperties.getCacheSessionTableName(), bean::setKeyPrefix);
+		
 		return bean;
 	}
 	
@@ -111,14 +110,9 @@ public class ShiroRedisConfig extends ShiroConfig {
 		bean.setRedisManager(redisManager);
 		
 		//缓存数据所用的表名
-		if (StringUtils.isNotBlank(shiroProperties.getCacheDataTableName())) {
-			bean.setKeyPrefix(shiroProperties.getCacheDataTableName());
-		}
-		
+		Assist.ifNotBlank(shiroProperties.getCacheDataTableName(), bean::setKeyPrefix);
 		//缓存数据所用的实体主键名
-		if (StringUtils.isNotBlank(shiroProperties.getCacheDataEntityId())) {
-			bean.setPrincipalIdFieldName(shiroProperties.getCacheDataEntityId());
-		}
+		Assist.ifNotBlank(shiroProperties.getCacheDataEntityId(), bean::setPrincipalIdFieldName);
 		
 		return bean;
 	}
@@ -132,17 +126,14 @@ public class ShiroRedisConfig extends ShiroConfig {
 	 * @return
 	 */
 	protected IRedisManager createRedisManagerCluster(RedisProperties properties) {
-		Assert.isTrue(ObjectUtils.isNotEmpty(properties.getHostName()), "redis hostName cannot be null");
+		Assist.notEmpty(properties.getHostName(), "redis hostName cannot be null");
 		
 		RedisClusterManager bean = new RedisClusterManager();
 		String newHostName = StringUtils.join(properties.getHostName(), BConst.COMMA);
 		bean.setHost(newHostName);
-		if (properties.getDatabase() != null) {
-			bean.setDatabase(properties.getDatabase());
-		}
-		if (StringUtils.isNotBlank(properties.getPassword())) {
-			bean.setPassword(properties.getPassword());
-		}
+		Assist.ifNotNull(properties.getDatabase(), bean::setDatabase);
+		Assist.ifNotBlank(properties.getPassword(), bean::setPassword);
+		
 		return bean;
 	}
 	
@@ -152,16 +143,13 @@ public class ShiroRedisConfig extends ShiroConfig {
 	 * @return
 	 */
 	protected IRedisManager createRedisManagerSingle(RedisProperties properties) {
-		Assert.isTrue(ObjectUtils.isNotEmpty(properties.getHostName()), "redis hostName cannot be null");
+		Assist.notEmpty(properties.getHostName(), "redis hostName cannot be null");
 		
 		RedisManager bean = new RedisManager();
 		bean.setHost(properties.getHostName()[0]);
-		if (properties.getDatabase() != null) {
-			bean.setDatabase(properties.getDatabase());
-		}
-		if (StringUtils.isNotBlank(properties.getPassword())) {
-			bean.setPassword(properties.getPassword());
-		}
+		Assist.ifNotNull(properties.getDatabase(), bean::setDatabase);
+		Assist.ifNotBlank(properties.getPassword(), bean::setPassword);
+		
 		return bean;
 	}
 	

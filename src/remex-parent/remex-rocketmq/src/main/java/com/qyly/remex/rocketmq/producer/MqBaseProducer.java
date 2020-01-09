@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.qyly.remex.constant.BConst;
 import com.qyly.remex.exception.RemexException;
 import com.qyly.remex.utils.Assert;
+import com.qyly.remex.utils.Assist;
 
 /**
  * mq生产者基础类
@@ -57,10 +58,7 @@ public class MqBaseProducer extends DefaultMQProducer {
 	 * @param content
 	 */
 	public SendResult send(String topic, String tag, Object content, Integer delayTimeLevel) {
-		String contentJson = null;
-		if (content != null) {
-			contentJson = JSONObject.toJSONString(content);
-		}
+		String contentJson = JSONObject.toJSONString(content);
 		SendResult result = send(topic, tag, contentJson, delayTimeLevel);
 		judgeResult(result);
 		return result;
@@ -111,9 +109,7 @@ public class MqBaseProducer extends DefaultMQProducer {
 		try {
 			Message msg = new Message(topic, tag, content.getBytes());
 			//消息延迟级别
-			if (delayTimeLevel != null) {
-				msg.setDelayTimeLevel(delayTimeLevel);;
-			}
+			Assist.ifNotNull(delayTimeLevel, msg::setDelayTimeLevel);
 			SendResult result = send(msg);
 			return result;
 		} catch (Exception e) {

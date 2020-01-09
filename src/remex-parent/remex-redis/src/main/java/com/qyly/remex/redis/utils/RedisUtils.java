@@ -2,11 +2,9 @@ package com.qyly.remex.redis.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.ListOperations;
@@ -16,9 +14,7 @@ import org.springframework.data.redis.core.ValueOperations;
 
 import com.alibaba.fastjson.JSONObject;
 import com.qyly.remex.utils.ApplicationContextUtils;
-import com.qyly.remex.utils.Assert;
-import com.qyly.remex.utils.CollectionUtils;
-import com.qyly.remex.utils.StringUtils;
+import com.qyly.remex.utils.Assist;
 
 /**
  * redis工具类
@@ -34,11 +30,11 @@ public class RedisUtils {
 	 */
 	public static RedisTemplate<String, Object> getRedisTemplate() {
 		ApplicationContext applicationContext = ApplicationContextUtils.getContext();
-		Assert.notNull(applicationContext, "applicationContext cannot be null");
+		Assist.notNull(applicationContext, "applicationContext cannot be null");
 		
 		@SuppressWarnings("unchecked")
 		RedisTemplate<String, Object> redisTemplate = (RedisTemplate<String, Object>) applicationContext.getBean("redisTemplate");
-		Assert.notNull(redisTemplate, "redisTemplate cannot be null");
+		Assist.notNull(redisTemplate, "redisTemplate cannot be null");
 		return redisTemplate;
 	}
 	
@@ -72,9 +68,7 @@ public class RedisUtils {
 	 * @return
 	 */
 	public static Set<String> getKeys(String keyPrefix) {
-		if (StringUtils.isBlank(keyPrefix)) {
-			return null;
-		}
+		if (Assist.isBlank(keyPrefix)) return null;
 		return getRedisTemplate().keys(keyPrefix);
 	}
 	
@@ -84,12 +78,8 @@ public class RedisUtils {
 	 * @return true：存在；false：不存在；
 	 */
 	public static boolean existKey(String key) {
-		if (StringUtils.isBlank(key)) {
-			return false;
-		}
-		
-		Set<String> keySet = getKeys(key);
-		return CollectionUtils.isNotEmpty(keySet);
+		if (Assist.isBlank(key)) return false;
+		return Assist.isNotEmpty(getKeys(key));
 	}
 	
 	/**
@@ -98,13 +88,8 @@ public class RedisUtils {
 	 * @param value
 	 */
 	public static void setToValue(String key, Object value) {
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
-		
-		if (value != null) {
-			getOpsForValue().set(key, value);
-		}
+		if (Assist.isBlank(key)) return;
+		getOpsForValue().set(key, value);
 	}
 	
 	/**
@@ -114,16 +99,12 @@ public class RedisUtils {
 	 * @param seconds 失效时间，单位：秒
 	 */
 	public static void setToValue(String key, Object value, long seconds) {
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
-		
-		if (value != null) {
-			if (seconds > 0) {
-				getOpsForValue().set(key, value, seconds, TimeUnit.SECONDS);
-			} else {
-				getOpsForValue().set(key, value);
-			}
+		if (Assist.isBlank(key)) return;
+
+		if (seconds > 0) {
+			getOpsForValue().set(key, value, seconds, TimeUnit.SECONDS);
+		} else {
+			getOpsForValue().set(key, value);
 		}
 	}
 	
@@ -133,14 +114,8 @@ public class RedisUtils {
 	 * @param value
 	 */
 	public static void setToValueJson(String key, Object value) {
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
-		
-		if (value != null) {
-			String json = JSONObject.toJSONString(value);
-			getOpsForValue().set(key, json);
-		}
+		if (Assist.isBlank(key)) return;
+		getOpsForValue().set(key, Assist.toJson(value));
 	}
 	
 	/**
@@ -150,18 +125,14 @@ public class RedisUtils {
 	 * @param seconds 失效时间，单位：秒
 	 */
 	public static void setToValueJson(String key, Object value, long seconds) {
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
-		
-		if (value != null) {
-			String json = JSONObject.toJSONString(value);
-			
-			if (seconds > 0) {
-				getOpsForValue().set(key, json, seconds, TimeUnit.SECONDS);
-			} else {
-				getOpsForValue().set(key, json);
-			}
+		if (Assist.isBlank(key)) return;
+
+		String json = Assist.ifNotNullFn(value, JSONObject::toJSONString);
+
+		if (seconds > 0) {
+			getOpsForValue().set(key, json, seconds, TimeUnit.SECONDS);
+		} else {
+			getOpsForValue().set(key, json);
 		}
 	}
 	
@@ -172,10 +143,7 @@ public class RedisUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getToValue(String key) {
-		if (StringUtils.isBlank(key)) {
-			return null;
-		}
-		
+		if (Assist.isBlank(key)) return null;
 		return (T) getOpsForValue().get(key);
 	}
 	
@@ -185,10 +153,7 @@ public class RedisUtils {
 	 * @return
 	 */
 	public static String getToValueString(String key) {
-		if (StringUtils.isBlank(key)) {
-			return null;
-		}
-		
+		if (Assist.isBlank(key)) return null;
 		return (String) getOpsForValue().get(key);
 	}
 	
@@ -198,15 +163,8 @@ public class RedisUtils {
 	 * @return
 	 */
 	public static Integer getToValueInt(String key) {
-		if (StringUtils.isBlank(key)) {
-			return null;
-		}
-		
-		Object value = getOpsForValue().get(key);
-		if (value == null) {
-			return null;
-		}
-		return Integer.valueOf(value.toString());
+		if (Assist.isBlank(key)) return null;
+		return Assist.toInteger(getOpsForValue().get(key));
 	}
 
 	/**
@@ -215,15 +173,8 @@ public class RedisUtils {
 	 * @return
 	 */
 	public static Long getToValueLong(String key) {
-		if (StringUtils.isBlank(key)) {
-			return null;
-		}
-		
-		Object value = getOpsForValue().get(key);
-		if (value == null) {
-			return null;
-		}
-		return Long.valueOf(value.toString());
+		if (Assist.isBlank(key)) return null;
+		return Assist.toLong(getOpsForValue().get(key));
 	}
 
 	/**
@@ -232,16 +183,8 @@ public class RedisUtils {
 	 * @return
 	 */
 	public static <T> T getToValueJson(String key, Class<T> clazz) {
-		if (StringUtils.isBlank(key)) {
-			return null;
-		}
-		
-		T obj = null;
-		String json = getToValueString(key);
-		if (StringUtils.isNotBlank(json)) {
-			obj = JSONObject.parseObject(json, clazz);
-		}
-		return obj;
+		if (Assist.isBlank(key)) return null;
+		return JSONObject.parseObject(getToValueString(key), clazz);
 	}
 	
 	/**
@@ -250,20 +193,14 @@ public class RedisUtils {
 	 * @return
 	 */
 	public static <T> List<T> getToValueBatchJson(String keyPrefix, Class<T> clazz) {
-		if (StringUtils.isBlank(keyPrefix)) {
-			return null;
-		}
+		if (Assist.isBlank(keyPrefix)) return null;
 		
 		List<T> list = new ArrayList<>();
 		Set<String> keys = getKeys(keyPrefix);
-		if (CollectionUtils.isNotEmpty(keys)) {
-			for (String key : keys) {
-				T obj = getToValueJson(key, clazz);
-				if (obj != null) {
-					list.add(obj);
-				}
-			}
-		}
+		
+		Assist.forEach(keys, key -> {
+			Assist.ifNotNull(getToValueJson(key, clazz), list::add);
+		});
 		
 		return list;
 	}
@@ -273,9 +210,7 @@ public class RedisUtils {
 	 * @param key
 	 */
 	public static void increment(String key) {
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
+		if (Assist.isBlank(key)) return;
 		getOpsForValue().increment(key, 1);
 	}
 	
@@ -284,9 +219,7 @@ public class RedisUtils {
 	 * @param key
 	 */
 	public static void increment(String key, long seconds) {
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
+		if (Assist.isBlank(key)) return;
 		
 		if (!existKey(key)) {
 			setToValue(key, 0, seconds);
@@ -299,9 +232,7 @@ public class RedisUtils {
 	 * @param key
 	 */
 	public static void decrement(String key) {
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
+		if (Assist.isBlank(key)) return;
 		getOpsForValue().increment(key, -1);
 	}
 	
@@ -310,9 +241,7 @@ public class RedisUtils {
 	 * @param key
 	 */
 	public static void decrement(String key, long seconds) {
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
+		if (Assist.isBlank(key)) return;
 		
 		if (!existKey(key)) {
 			setToValue(key, 0, seconds);
@@ -326,9 +255,7 @@ public class RedisUtils {
 	 * @param value
 	 */
 	public static void setToSet(String key, Object value) {
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
+		if (Assist.isBlank(key)) return;
 
 		getOpsForSet().add(key, value);
 	}
@@ -339,16 +266,10 @@ public class RedisUtils {
 	 * @param vals
 	 */
 	public static void setToSet(String key, Collection<?> coll) {
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
+		if (Assist.isBlank(key)) return;
 		
 		SetOperations<String, Object> op = getOpsForSet();
-		if (CollectionUtils.isNotEmpty(coll)) {
-			for (Object value : coll) {
-				op.add(key, value);
-			}
-		}
+		Assist.forEach(coll, value -> op.add(key, value));
 	}
 	
 	/**
@@ -357,17 +278,10 @@ public class RedisUtils {
 	 * @param vals
 	 */
 	public static void setToSetJson(String key, Collection<?> coll) {
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
+		if (Assist.isBlank(key)) return;
 		
 		SetOperations<String, Object> op = getOpsForSet();
-		if (CollectionUtils.isNotEmpty(coll)) {
-			for (Object value : coll) {
-				String json = JSONObject.toJSONString(value);
-				op.add(key, json);
-			}
-		}
+		Assist.forEach(coll, value -> op.add(key, JSONObject.toJSONString(value)));
 	}
 
 	/**
@@ -376,13 +290,9 @@ public class RedisUtils {
 	 * @return
 	 */
 	public static Set<String> getToSet(String key) {
-		if (StringUtils.isBlank(key)) {
-			return null;
-		}
-		SetOperations<String, Object> op = getOpsForSet();
-		Set<Object> set = op.members(key);
-		if (set == null) return null;
-		return set.stream().map(Object::toString).collect(Collectors.toSet());
+		if (Assist.isBlank(key)) return null;
+		Set<Object> set = getOpsForSet().members(key);
+		return Assist.forEachToSet(set, Object::toString);
 	}
 
 	/**
@@ -391,7 +301,7 @@ public class RedisUtils {
 	 * @param value
 	 */
 	public static void deleteToSet(String key, Object... value){
-		if (StringUtils.isNotBlank(key) || value != null) {
+		if (Assist.isNotBlank(key) || value != null) {
 			SetOperations<String, Object> op = getOpsForSet();
 			op.remove(key, value);
 		}
@@ -406,28 +316,9 @@ public class RedisUtils {
 	 * @return
 	 */
 	public static <T> Set<T> getToSetJson(String key, Class<T> clazz) {
-		if (StringUtils.isBlank(key)) {
-			return null;
-		}
-		
-		SetOperations<String, Object> op = getOpsForSet();
-		Set<Object> set = op.members(key);
-		
-		if (CollectionUtils.isEmpty(set)) {
-			return null;
-		}
-		
-		Set<T> entitySet = new HashSet<T>();
-		for (Object obj : set) {
-			if (obj == null) {
-				continue;
-			}
-			
-			T entity = JSONObject.parseObject(obj.toString(), clazz);
-			entitySet.add(entity);
-		}
-		
-		return entitySet;
+		if (Assist.isBlank(key)) return null;
+		Set<Object> set = getOpsForSet().members(key);
+		return Assist.forEachToSet(set, obj -> JSONObject.parseObject(obj.toString(), clazz));
 	}
 	
 	/**
@@ -436,10 +327,7 @@ public class RedisUtils {
 	 * @param value
 	 */
 	public static void setToList(String key, Object value) {
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
-		
+		if (Assist.isBlank(key)) return;
 		getOpsForList().rightPush(key, value);
 	}
 	
@@ -449,16 +337,10 @@ public class RedisUtils {
 	 * @param vals
 	 */
 	public static void setToList(String key, Collection<?> coll) {
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
+		if (Assist.isBlank(key)) return;
 		
 		ListOperations<String, Object> op = getOpsForList();
-		if (CollectionUtils.isNotEmpty(coll)) {
-			for (Object value : coll) {
-				op.rightPush(key, value);
-			}
-		}
+		Assist.forEach(coll, value -> op.rightPush(key, value));
 	}
 	
 	/**
@@ -467,17 +349,10 @@ public class RedisUtils {
 	 * @param vals
 	 */
 	public static void setToListJson(String key, Collection<?> coll) {
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
+		if (Assist.isBlank(key)) return;
 		
 		ListOperations<String, Object> op = getOpsForList();
-		if (CollectionUtils.isNotEmpty(coll)) {
-			for (Object value : coll) {
-				String json = JSONObject.toJSONString(value);
-				op.rightPush(key, json);
-			}
-		}
+		Assist.forEach(coll, value -> op.rightPush(key, JSONObject.toJSONString(value)));
 	}
 	
 	/**
@@ -488,27 +363,12 @@ public class RedisUtils {
 	 * @return
 	 */
 	public static <T> List<T> getToListJson(String key, Class<T> clazz) {
-		if (StringUtils.isBlank(key)) {
-			return null;
-		}
+		if (Assist.isBlank(key)) return null;
 		
 		ListOperations<String, Object> op = getOpsForList();
 		List<Object> list = op.range(key, 0, -1);
 		
-		if (CollectionUtils.isEmpty(list)) {
-			return null;
-		}
-		
-		List<T> entityList = new ArrayList<T>();
-		for (Object obj : list) {
-			if (obj == null) {
-				continue;
-			}
-			
-			T entity = JSONObject.parseObject(obj.toString(), clazz);
-			entityList.add(entity);
-		}
-		return entityList;
+		return Assist.forEachToList(list, obj -> JSONObject.parseObject(obj.toString(), clazz));
 	}
 
 	/**
@@ -516,9 +376,7 @@ public class RedisUtils {
 	 * @param key String
 	 */
 	public static void delKey(String key){
-		if (StringUtils.isBlank(key)) {
-			return;
-		}
+		if (Assist.isBlank(key)) return;
 		
 		getRedisTemplate().delete(key);
 	}
@@ -528,9 +386,7 @@ public class RedisUtils {
 	 * @param key String
 	 */
 	public static void delKey(Set<String> keys){
-		if (CollectionUtils.isEmpty(keys)) {
-			return;
-		}
+		if (Assist.isEmpty(keys)) return;
 		
 		getRedisTemplate().delete(keys);
 	}

@@ -15,6 +15,10 @@
 		<groupId>com.qyly.remex</groupId>
 		<artifactId>remex-core</artifactId>
 	</dependency>
+	<dependency>
+		<groupId>com.qyly.remex</groupId>
+		<artifactId>remex-web</artifactId>
+	</dependency>
 	
   	<dependency>
 	    <groupId>commons-net</groupId>

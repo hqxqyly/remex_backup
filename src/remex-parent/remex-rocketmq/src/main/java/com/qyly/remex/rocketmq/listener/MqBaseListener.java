@@ -17,6 +17,7 @@ public abstract class MqBaseListener implements MessageListenerConcurrently {
 
 	@Override
 	public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
+		
 		for (MessageExt messageExt : msgs) {
 			String message = new String(messageExt.getBody());
 			

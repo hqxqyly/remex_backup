@@ -1,20 +1,26 @@
 package com.qyly.remex.ftp.client;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Base64;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.qyly.remex.constant.BConst;
 import com.qyly.remex.exception.RemexException;
 import com.qyly.remex.ftp.properties.FtpProperties;
 import com.qyly.remex.utils.Assert;
+import com.qyly.remex.utils.Assist;
 import com.qyly.remex.utils.FileUtils;
-import com.qyly.remex.utils.ObjectUtils;
+import com.qyly.remex.utils.IdUtils;
 import com.qyly.remex.utils.StringUtils;
 
 /**
@@ -24,17 +30,30 @@ import com.qyly.remex.utils.StringUtils;
  *
  */
 public class FtpClient {
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+protected Logger logger = LoggerFactory.getLogger(getClass());
 	
-	/** 配置属性 */
-	protected FtpProperties context = new FtpProperties();
+	/** ftp服务器地址 */
+	protected String hostName = null;
+    
+	/** ftp服务器端口 */
+	protected Integer port = null;
+    
+    /** ftp服务器用户名 */
+	protected String userName = null;
+    
+    /** ftp服务器密码 */
+	protected String password = null;
+    
+    /** ftp每次读取文件流时缓存数组的大小，默认1024 */
+	protected int bufferSize = 1024;
 	
 	public FtpClient() {
 		
 	}
 	
-	public FtpClient(FtpProperties context) {
-		setContext(context);
+	public FtpClient(FtpProperties properties) {
+		//提取ftp配置属性
+		fetchFtpProperties(properties);
 	}
 	
 	/**
@@ -44,8 +63,8 @@ public class FtpClient {
 	 * @param srcInputStream 源文件输入流
 	 */
 	public void upload(String destDirectory, String destFileName, InputStream srcInputStream) {
-		Assert.notBlank(destFileName, "ftp upload destFileName cannot be blank");
-		Assert.notNull(srcInputStream, "ftp upload srcInputStream cannot be null");
+		Assert.notBlank(destFileName, "ftp upload destFileName is blank");
+		Assert.notNull(srcInputStream, "ftp upload srcInputStream is null");
 		
 		FTPClient ftpClient = null;
 		try {
@@ -65,9 +84,28 @@ public class FtpClient {
 			throw new RemexException("ftp upload error", e);
 		} finally {
 			closeFtp(ftpClient);
-			ObjectUtils.close(srcInputStream);
+			Assist.close(srcInputStream);
 		}
 	}
+	
+	/**
+	 * 上传
+	 * @param destDirectory 目标文件路径，为空则保存到根目录下
+	 * @param file 文件
+	 */
+	public String upload(String destDirectory, MultipartFile file) {
+		String fileName = null;
+		try {
+			InputStream inputStream = file.getInputStream();
+			fileName = IdUtils.createId() + FileUtils.getFileSuffix(file.getOriginalFilename());
+			upload(destDirectory, fileName, inputStream);
+		} catch (Exception e) {
+			throw new RemexException("ftp upload error", e);
+		}
+		return fileName;
+	}
+	
+	
 	
 	/**
 	 * 下载
@@ -76,14 +114,8 @@ public class FtpClient {
 	 * @param destOutputStream 目标文件输出流
 	 */
 	public void download(String srcDirectory, String srcFileName, OutputStream destOutputStream) {
-		Assert.notBlank(srcFileName, "ftp download srcFileName cannot be blank");
-		
-		//封装目录路径
-		srcDirectory = packFileDirectory(srcDirectory);
-
 		//文件完整路径
-		String srcFilePath = FileUtils.joinFilePath(srcDirectory, srcFileName);
-		
+		String srcFilePath = packFilePath(srcDirectory, srcFileName);
 		//下载
 		download(srcFilePath, destOutputStream);
 	}
@@ -94,16 +126,13 @@ public class FtpClient {
 	 * @param destOutputStream 目标文件输出流
 	 */
 	public void download(String srcFilePath, OutputStream destOutputStream) {
-		Assert.notBlank(srcFilePath, "ftp download srcFilePath cannot be blank");
-		Assert.notNull(destOutputStream, "ftp download destOutputStream cannot be null");
+		Assert.notBlank(srcFilePath, "ftp download srcFilePath is blank");
+		Assert.notNull(destOutputStream, "ftp download destOutputStream is null");
 		
 		FTPClient ftpClient = null;
 		try {
 			//取得ftp
 			ftpClient = getFtp();
-			
-			//封装目录路径
-			srcFilePath = packFileDirectory(srcFilePath);
 			
 			ftpClient.enterLocalPassiveMode();
 			// 下载
@@ -113,8 +142,65 @@ public class FtpClient {
 			throw new RemexException("ftp download error", e);
 		} finally {
 			closeFtp(ftpClient);
-			ObjectUtils.close(destOutputStream);
+			Assist.close(destOutputStream);
 		}
+	}
+	
+	/**
+	 * 下载
+	 * @param srcDirectory 源文件路径
+	 * @param srcFileName 源文件名
+	 * @param destOutputStream 目标文件输出流
+	 */
+	public void download(String srcDirectory, String srcFileName, HttpServletResponse response) {
+		//文件完整路径
+		String srcFilePath = packFilePath(srcDirectory, srcFileName);
+		//下载
+		download(srcFilePath, response);
+	}
+	
+	/**
+	 * 下载
+	 * @param srcFilePath 源文件完整路径
+	 * @param destOutputStream 目标文件输出流
+	 */
+	public void download(String srcFilePath, HttpServletResponse response) {
+		try {
+			response.setCharacterEncoding("UTF-8");
+			response.setContentType("multipart/form-data;charset=UTF-8");
+			response.setHeader("Content-Disposition", "attachment;fileName=" + srcFilePath);
+			
+			OutputStream outputStream = response.getOutputStream();
+			
+			download(srcFilePath, outputStream);
+		} catch (Exception e) {
+			throw new RemexException("ftp download error", e);
+		}
+	}
+	
+	/**
+	 * 下载
+	 * @param srcDirectory 源文件路径
+	 * @param srcFileName 源文件名
+	 * @param destOutputStream 目标文件输出流
+	 */
+	public String downloadBase64(String srcDirectory, String srcFileName, OutputStream destOutputStream) {
+		//文件完整路径
+		String srcFilePath = packFilePath(srcDirectory, srcFileName);
+		//下载
+		return downloadBase64(srcFilePath, destOutputStream);
+	}
+	
+	/**
+	 * 下载
+	 * @param srcFilePath 源文件完整路径
+	 * @param destOutputStream 目标文件输出流
+	 */
+	public String downloadBase64(String srcFilePath, OutputStream destOutputStream) {
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		download(srcFilePath, byteArrayOutputStream);
+		byte[] bytes = byteArrayOutputStream.toByteArray();
+		return Base64.getEncoder().encodeToString(bytes);
 	}
 	
 	/**
@@ -123,14 +209,8 @@ public class FtpClient {
 	 * @param srcFileName 源文件名
 	 */
 	public void deleteFile(String srcDirectory, String srcFileName) {
-		Assert.notBlank(srcFileName, "ftp download srcFileName cannot be blank");
-
-		//封装目录路径
-		srcDirectory = packFileDirectory(srcDirectory);
-
 		//文件完整路径
-		String srcFilePath = FileUtils.joinFilePath(srcDirectory, srcFileName);
-
+		String srcFilePath = packFilePath(srcDirectory, srcFileName);
 		//文件删除
 		deleteFile(srcFilePath);
 	}
@@ -140,7 +220,7 @@ public class FtpClient {
 	 * @param srcFilePath 源文件完整路径
 	 */
 	public void deleteFile(String srcFilePath) {
-		Assert.notBlank(srcFilePath, "ftp deleteFile srcFilePath cannot be blank");
+		Assert.notBlank(srcFilePath, "ftp deleteFile srcFilePath is blank");
 		
 		FTPClient ftpClient = null;
 		try {
@@ -167,9 +247,9 @@ public class FtpClient {
 	 * @param destFileName 目标文件名
 	 */
 	public void copyFile(String srcFilePath, String destDirectory, String destFileName) {
-		Assert.notBlank(srcFilePath, "ftp copyFile srcFilePath cannot be blank");
-		Assert.notBlank(destDirectory, "ftp copyFile destDirectory cannot be blank");
-		Assert.notBlank(destFileName, "ftp copyFile destFileName cannot be blank");
+		Assert.notBlank(srcFilePath, "ftp copyFile srcFilePath is blank");
+		Assert.notBlank(destDirectory, "ftp copyFile destDirectory is blank");
+		Assert.notBlank(destFileName, "ftp copyFile destFileName is blank");
 		
 		FTPClient ftpClient = null;
 		InputStream inputStream = null;
@@ -182,7 +262,7 @@ public class FtpClient {
 			
 			//取得源文件输入流
 			inputStream = ftpClient.retrieveFileStream(srcFilePath);
-			Assert.notNull(inputStream, "ftp copyFile inputStream cannot be null");
+			Assert.notNull(inputStream, "ftp copyFile inputStream is null");
 
 			//上传文件
 			upload(destDirectory, destFileName, inputStream);
@@ -191,7 +271,7 @@ public class FtpClient {
 			throw new RemexException("ftp copyFile error", e);
 		} finally {
 			closeFtp(ftpClient);
-			ObjectUtils.close(inputStream);
+			Assist.close(inputStream);
 		}
 	}
 	
@@ -202,7 +282,7 @@ public class FtpClient {
 	 * @param fileDirectory 文件路径
 	 */
 	protected void changeWorkingDirectory(FTPClient ftpClient, String fileDirectory) {
-		Assert.notNull(ftpClient, "ftpClient cannot be null");
+		Assert.notNull(ftpClient, "ftpClient is null");
 		
 		if (StringUtils.isNotBlank(fileDirectory)) {
 			try {
@@ -245,6 +325,18 @@ public class FtpClient {
 	}
 	
 	/**
+	 * 提取ftp配置属性
+	 * @param properties
+	 */
+	public void fetchFtpProperties(FtpProperties properties) {
+		this.hostName = properties.getHostName();
+		this.port = properties.getPort();
+		this.userName = properties.getUserName();
+		this.password = properties.getPassword();
+		this.bufferSize = properties.getBufferSize();
+	}
+	
+	/**
 	 * 连接ftp
 	 * @return
 	 */
@@ -254,14 +346,14 @@ public class FtpClient {
 			
 			ftpClient.enterLocalPassiveMode();
 			//连接FTP服务器
-			ftpClient.connect(context.getHostName(), context.getPort());
+			ftpClient.connect(hostName, port);
 			//登录FTP服务器
-			ftpClient.login(context.getUserName(), context.getPassword());
+			ftpClient.login(userName, password);
 			//以二进制上传文件
 			ftpClient.setFileTransferMode(FTP.STREAM_TRANSFER_MODE);  
 			ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
 			//每次读取文件流时缓存数组的大小
-			ftpClient.setBufferSize(context.getBufferSize());
+			ftpClient.setBufferSize(bufferSize);
 			
 			return ftpClient;
 		} catch (Exception e) {
@@ -335,12 +427,62 @@ public class FtpClient {
 		return fileDirectory;
 	}
 	
+	/**
+	 * 封装文件路径
+	 * @param fileDirectory
+	 * @param fileName
+	 * @return
+	 */
+	protected String packFilePath(String fileDirectory, String fileName) {
+		Assert.notBlank(fileName, "ftp fileName is blank");
 
-	public void setContext(FtpProperties context) {
-		this.context = context;
+		//封装目录路径
+		fileDirectory = packFileDirectory(fileDirectory);
+
+		//文件完整路径
+		String srcFilePath = FileUtils.joinFilePath(fileDirectory, fileName);
+		
+		return srcFilePath;
 	}
 	
-	public FtpProperties getContext() {
-		return context;
+
+	public String getHostName() {
+		return hostName;
+	}
+
+	public void setHostName(String hostName) {
+		this.hostName = hostName;
+	}
+
+	public Integer getPort() {
+		return port;
+	}
+
+	public void setPort(Integer port) {
+		this.port = port;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public int getBufferSize() {
+		return bufferSize;
+	}
+
+	public void setBufferSize(int bufferSize) {
+		this.bufferSize = bufferSize;
 	}
 }

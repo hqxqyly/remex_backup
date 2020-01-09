@@ -13,6 +13,9 @@
     <remexVersion>0.0.1-SNAPSHOT</remexVersion>
 	<maven.compiler.source>1.8</maven.compiler.source>
 	<maven.compiler.target>1.8</maven.compiler.target>
+	<droolsVersion>7.0.0.Final</droolsVersion>
+	<poiVersion>4.1.1</poiVersion>
+	<cloudVersion>1.4.7.RELEASE</cloudVersion>
   </properties>
   
   <modules>
@@ -31,6 +34,9 @@
     <module>remex-shiro-redis</module>
     <module>remex-security</module>
     <module>remex-web</module>
+    <module>remex-drools</module>
+    <module>remex-poi</module>
+    <module>remex-cloud</module>
   </modules>
 
   <dependencyManagement>
@@ -190,6 +196,72 @@
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-security</artifactId>
 		    <version>${bootVersion}</version>
+		</dependency>
+		<dependency>
+	    	<groupId>org.springframework</groupId>
+	        <artifactId>spring-jdbc</artifactId>
+	        <version>${springVersion}</version>
+	    </dependency>
+	    
+	    <dependency>
+		   	<groupId>org.drools</groupId>
+		    <artifactId>drools-core</artifactId>
+		    <version>${droolsVersion}</version>
+		</dependency>
+	    <dependency>
+		    <groupId>org.drools</groupId>
+		    <artifactId>drools-compiler</artifactId>
+		    <version>${droolsVersion}</version>
+	    </dependency>
+	    <dependency>
+		    <groupId>org.drools</groupId>
+		    <artifactId>drools-decisiontables</artifactId>
+		    <version>${droolsVersion}</version>
+	    </dependency>
+	    <dependency>
+		    <groupId>org.drools</groupId>
+		    <artifactId>drools-templates</artifactId>
+		    <version>${droolsVersion}</version>
+	    </dependency>
+	    <dependency>
+	   		<groupId>org.kie</groupId>
+	   		<artifactId>kie-api</artifactId>
+		    <version>${droolsVersion}</version>
+		</dependency>
+		<dependency>
+	   		<groupId>org.mvel</groupId>
+	   		<artifactId>mvel2</artifactId>
+	   		<version>2.4.0.Final</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi</artifactId>
+		    <version>${poiVersion}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi-ooxml</artifactId>
+		    <version>${poiVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-netflix-core</artifactId>
+			<version>${cloudVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-feign</artifactId>
+			<version>${cloudVersion}</version>
+		</dependency>
+		<dependency>
+	        <groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka</artifactId>
+			<version>${cloudVersion}</version>
+	    </dependency>
+	    <dependency>
+		    <groupId>com.netflix.servo</groupId>
+		    <artifactId>servo-core</artifactId>
+		    <version>0.10.1</version>
 		</dependency>
 	</dependencies>
   </dependencyManagement>

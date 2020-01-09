@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 
 import com.qyly.remex.exception.RemexException;
-import com.qyly.remex.utils.Assert;
+import com.qyly.remex.utils.Assist;
 
 /**
  * mq消费者
@@ -52,7 +52,7 @@ public class MqConsumer extends MqBaseConsumer implements ApplicationListener<Ap
 		}
 		
 		MessageListenerConcurrently listener = applicationContext.getBean(listenerClass);
-		Assert.notNull(listener, "listener cannot be null for applicationContext");
+		Assist.notNull(listener, "listener cannot be null for applicationContext");
 		
 		return listener;
 	}

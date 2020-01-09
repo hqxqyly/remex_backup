@@ -9,7 +9,7 @@ import java.util.Map;
 import com.qyly.remex.exception.RemexException;
 import com.qyly.remex.jasperreport.data.JRBeanBatchDataSource;
 import com.qyly.remex.jasperreport.interfaces.IReportBatchReadHandle;
-import com.qyly.remex.utils.Assert;
+import com.qyly.remex.utils.Assist;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -81,9 +81,9 @@ public class ExportUtils {
 	 */
 	public static void exportExcel(OutputStream outputStream, JasperReport jasperReport, Map<String, Object> parameters
 			, JRDataSource dataSource) {
-		Assert.notNull(outputStream, "Report export outputStream must not be null");
-		Assert.notNull(jasperReport, "Report export templateInputStream must not be null");
-		Assert.notNull(dataSource, "Report export dataSource must not be null");
+		Assist.notNull(outputStream, "Report export outputStream must not be null");
+		Assist.notNull(jasperReport, "Report export templateInputStream must not be null");
+		Assist.notNull(dataSource, "Report export dataSource must not be null");
 		
 		try {
 			if (parameters == null) {

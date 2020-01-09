@@ -24,6 +24,7 @@ import org.springframework.context.annotation.DependsOn;
 import com.qyly.remex.shiro.component.filter.ShiroAuthenticationFilter;
 import com.qyly.remex.shiro.constant.ShiroOptions;
 import com.qyly.remex.shiro.properties.ShiroProperties;
+import com.qyly.remex.utils.Assist;
 import com.qyly.remex.utils.BeanUtils;
 
 /**
@@ -55,9 +56,7 @@ public class ShiroConfig {
 
 		//取得shiro所用的拦截器列表
 		Map<String, Filter> filters = getFilters();
-		if (filters != null) {
-			bean.setFilters(filters);
-		}
+		Assist.ifNotNull(filters, bean::setFilters);
 		
 		//配置访问权限
 		Map<String, String> filterChainDefinitionMap = ShiroOptions.FILTER_CHAIN_DEFINITION_MAP;

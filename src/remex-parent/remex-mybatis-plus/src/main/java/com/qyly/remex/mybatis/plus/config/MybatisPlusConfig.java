@@ -9,8 +9,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
+import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
+import com.qyly.remex.mybatis.plus.injector.RemexSqlInjector;
 import com.qyly.remex.mybatis.plus.properties.MybatisPlusProperties;
 import com.qyly.remex.utils.StringUtils;
 
@@ -30,10 +32,15 @@ public class MybatisPlusConfig {
 	 */
 	@Bean
 	@ConditionalOnMissingBean
-	public MybatisSqlSessionFactoryBean createSqlSessionFactory(MybatisPlusProperties properties, DataSource dataSource) 
+	public MybatisSqlSessionFactoryBean createSqlSessionFactory(MybatisPlusProperties properties, DataSource dataSource
+			, ISqlInjector sqlInjector) 
 			throws Exception {
+		
+		properties.getGlobalConfig().setSqlInjector(sqlInjector);
+		
 		MybatisSqlSessionFactoryBean bean = new MybatisSqlSessionFactoryBean();
 		bean.setDataSource(dataSource);
+		bean.setGlobalConfig(properties.getGlobalConfig());
 		bean.setConfiguration(properties.getConfiguration());
 		
 		if (StringUtils.isNotBlank(properties.getResolveMapperLocations())) {
@@ -66,5 +73,15 @@ public class MybatisPlusConfig {
 	public MybatisPlusProperties createMybatisPlusProperties() {
 		MybatisPlusProperties properties = new MybatisPlusProperties();
 		return properties;
+	}
+	
+	/**
+	 * 创建sql解析注册器
+	 * @return
+	 */
+	@Bean
+	@ConditionalOnMissingBean
+	public ISqlInjector createSqlInjector() {
+		return new RemexSqlInjector();
 	}
 }

@@ -13,6 +13,12 @@ public class BConst {
 	/** 空字符口中  */
 	public final static String EMPTY = "";
 	
+	/** 是：1 */
+	public final static Integer YES = BConst.ONE;
+	
+	/** 否：0 */
+	public final static Integer NO = BConst.ZERO;
+	
 	/** 0 */
 	public final static Integer ZERO = new Integer(0);
 	

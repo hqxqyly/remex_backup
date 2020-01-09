@@ -12,6 +12,7 @@ import com.qyly.remex.security.component.modules.RemexDaoAuthenticationProvider;
 import com.qyly.remex.security.component.modules.RemexLogoutSuccessHandler;
 import com.qyly.remex.security.component.modules.RemexWebSecurityConfigurerAdapter;
 import com.qyly.remex.security.custom.RemexSecurityCustom;
+import com.qyly.remex.utils.Assist;
 
 /**
  * remex spring security config
@@ -64,14 +65,9 @@ public class RemexSecurityConfig {
 		RemexDaoAuthenticationProvider bean = new RemexDaoAuthenticationProvider();
 		
 		//用户获取业务方法
-		if (RemexSecurityCustom.USER_DETAILS_SERVICE != null) {
-			bean.setUserDetailsService(RemexSecurityCustom.USER_DETAILS_SERVICE);
-		}
-		
+		Assist.ifNotNull(RemexSecurityCustom.USER_DETAILS_SERVICE, bean::setUserDetailsService);
 		//密码加密方式
-		if (RemexSecurityCustom.PASSWORD_ENCODER != null) {
-			bean.setPasswordEncoder(RemexSecurityCustom.PASSWORD_ENCODER);;
-		}
+		Assist.ifNotNull(RemexSecurityCustom.PASSWORD_ENCODER, bean::setPasswordEncoder);
 		
 		return bean;
 	}

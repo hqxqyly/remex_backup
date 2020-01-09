@@ -38,9 +38,8 @@ public class PageHelperConfig {
         Properties properties = new Properties();
         fillPageHelperProperties(properties, createPageHelperProperties());
         interceptor.setProperties(properties);
-        for (SqlSessionFactory sqlSessionFactory : sqlSessionFactoryList) {
-            sqlSessionFactory.getConfiguration().addInterceptor(interceptor);
-        }
+        
+        sqlSessionFactoryList.forEach(o -> o.getConfiguration().addInterceptor(interceptor));
 	}
 
 	/**

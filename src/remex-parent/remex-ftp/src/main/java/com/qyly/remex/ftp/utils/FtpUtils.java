@@ -3,11 +3,14 @@ package com.qyly.remex.ftp.utils;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.context.ApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.qyly.remex.ftp.client.FtpClient;
 import com.qyly.remex.utils.ApplicationContextUtils;
-import com.qyly.remex.utils.Assert;
+import com.qyly.remex.utils.Assist;
 
 /**
  * ftp工具类
@@ -25,13 +28,9 @@ public class FtpUtils {
 	 * @return
 	 */
 	public static FtpClient getFtpClient() {
-		ApplicationContext applicationContext = ApplicationContextUtils.getContext();
-		Assert.notNull(applicationContext, "applicationContext cannot be null");
-		
-		FtpClient ftpClient = applicationContext.getBean(FtpClient.class);
-		Assert.notNull(ftpClient, "ftpClient cannot be null");
-		
-		return ftpClient;
+		ApplicationContext applicationContext = Assist.notNull(ApplicationContextUtils.getContext()
+				, "applicationContext cannot be null");
+		return Assist.notNull(applicationContext.getBean(FtpClient.class), "ftpClient is null");
 	}
 	
 	/**
@@ -42,6 +41,15 @@ public class FtpUtils {
 	 */
 	public static void upload(String destDirectory, String destFileName, InputStream srcInputStream) {
 		getFtpClient().upload(destDirectory, destFileName, srcInputStream);
+	}
+	
+	/**
+	 * 上传
+	 * @param destDirectory 目标文件路径，为空则保存到根目录下
+	 * @param file 文件
+	 */
+	public static String upload(String destDirectory, MultipartFile file) {
+		return getFtpClient().upload(destDirectory, file);
 	}
 	
 	/**
@@ -61,6 +69,44 @@ public class FtpUtils {
 	 */
 	public static void download(String srcFilePath, OutputStream destOutputStream) {
 		getFtpClient().download(srcFilePath, destOutputStream);
+	}
+	
+	/**
+	 * 下载
+	 * @param srcDirectory 源文件路径
+	 * @param srcFileName 源文件名
+	 * @param response
+	 */
+	public static void download(String srcDirectory, String srcFileName, HttpServletResponse response) {
+		getFtpClient().download(srcDirectory, srcFileName, response);
+	}
+	
+	/**
+	 * 下载
+	 * @param srcFilePath 源文件完整路径
+	 * @param response
+	 */
+	public static void download(String srcFilePath, HttpServletResponse response) {
+		getFtpClient().download(srcFilePath, response);
+	}
+	
+	/**
+	 * 下载
+	 * @param srcDirectory 源文件路径
+	 * @param srcFileName 源文件名
+	 * @param destOutputStream 目标文件输出流
+	 */
+	public static String downloadBase64(String srcDirectory, String srcFileName, OutputStream destOutputStream) {
+		return getFtpClient().downloadBase64(srcDirectory, srcFileName, destOutputStream);
+	}
+	
+	/**
+	 * 下载
+	 * @param srcFilePath 源文件完整路径
+	 * @param destOutputStream 目标文件输出流
+	 */
+	public static String downloadBase64(String srcFilePath, OutputStream destOutputStream) {
+		return getFtpClient().downloadBase64(srcFilePath, destOutputStream);
 	}
 	
 	/**

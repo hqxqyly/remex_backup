@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.qyly.remex.jasperreport.interfaces.IReportBatchReadHandle;
-import com.qyly.remex.utils.CollectionUtils;
+import com.qyly.remex.utils.Assist;
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRField;
@@ -49,7 +49,7 @@ public class JRBeanBatchDataSource extends JRAbstractBeanDataSource {
 			curIndex = -1;
 			
 			//读取数据
-			dataList = CollectionUtils.defaultList(readHandle.read(curPageIndex));
+			dataList = Assist.defaultList(readHandle.read(curPageIndex));
 		}
 		
 		//当没有数据了，则解析完毕

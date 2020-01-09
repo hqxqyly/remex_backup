@@ -1,5 +1,9 @@
 package com.qyly.remex.utils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import com.qyly.remex.constant.BConst;
 import com.qyly.remex.exception.RemexException;
 
@@ -10,6 +14,19 @@ import com.qyly.remex.exception.RemexException;
  *
  */
 public class FileUtils {
+	
+	/**
+	 * 创建FileInputStream
+	 * @param file
+	 * @return
+	 */
+	public static FileInputStream createFileInputStream(File file) {
+		try {
+			return new FileInputStream(file);
+		} catch (FileNotFoundException e) {
+			throw new RemexException("create FileInputStream error", e);
+		}
+	}
 	
 	/**
 	 * 拼接路径，以"/"进行拼接
