@@ -9,7 +9,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <springVersion>4.3.24.RELEASE</springVersion>
-    <bootVersion>1.5.21.RELEASE</bootVersion>
+    <bootVersion>2.5.12</bootVersion>
     <remexVersion>0.0.1-SNAPSHOT</remexVersion>
 	<maven.compiler.source>1.8</maven.compiler.source>
 	<maven.compiler.target>1.8</maven.compiler.target>
