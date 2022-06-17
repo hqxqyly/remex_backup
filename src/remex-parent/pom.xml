@@ -13,7 +13,7 @@
     <remexVersion>0.0.1-SNAPSHOT</remexVersion>
 	<maven.compiler.source>1.8</maven.compiler.source>
 	<maven.compiler.target>1.8</maven.compiler.target>
-	<droolsVersion>7.0.0.Final</droolsVersion>
+	<droolsVersion>7.60.0.Final</droolsVersion>
 	<poiVersion>4.1.1</poiVersion>
 	<cloudVersion>1.4.7.RELEASE</cloudVersion>
   </properties>
